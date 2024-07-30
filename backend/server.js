@@ -1,23 +1,19 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const passport = require('passport');
-require('dotenv').config();
-
-// App setup
+const connectDB = require('./config/db'); 
 const app = express();
-app.use(json());
-app.use(initialize());
+const PORT = process.env.PORT || 5000;
 
-// DB setup
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.log(err));
+// Connect to database
+connectDB();
 
-// Routes setup
+// Init Middleware
+app.use(express.json({ extended: false }));
+
+app.get('/', (req, res) => res.send('API Running'));
+
+// Define Routes
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/users', require('./routes/users'));
 
-// Server start
-const PORT = process.env.PORT || 5000;
+// Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
