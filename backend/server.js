@@ -1,7 +1,7 @@
-import express from 'express';
-import { connect } from 'mongoose';
-import { json } from 'body-parser';
-import { initialize } from 'passport';
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const passport = require('passport');
 require('dotenv').config();
 
 // App setup
@@ -10,7 +10,7 @@ app.use(json());
 app.use(initialize());
 
 // DB setup
-connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log(err));
 

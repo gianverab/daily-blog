@@ -1,21 +1,22 @@
-import { Router } from 'express';
-const router = Router();
-import BlogPost, { find, countDocuments, findById, findByIdAndUpdate } from '../models/BlogPost';
-import { authenticate } from 'passport';
+const express = require('express');
+const router = express.Router();
+const BlogPost = require('../models/BlogPost');
+const passport = require('passport');
+const jwt = require('jsonwebtoken');
 
 // Middleware for authentication
-const auth = authenticate('jwt', { session: false });
+const auth = passport.authenticate('jwt', { session: false });
 
 // Get all blog posts (with pagination)
 router.get('/', async (req, res) => {
   const { page = 1, limit = 5 } = req.query;
   try {
-    const posts = await find()
+    const posts = await BlogPost.find()
       .populate('author', ['name', 'avatar'])
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .exec();
-    const count = await countDocuments();
+    const count = await BlogPost.countDocuments();
     res.json({
       posts,
       totalPages: Math.ceil(count / limit),
@@ -30,7 +31,7 @@ router.get('/', async (req, res) => {
 // Get a single blog post
 router.get('/:id', async (req, res) => {
   try {
-    const post = await findById(req.params.id).populate('author', ['name', 'avatar']);
+    const post = await BlogPost.findById(req.params.id).populate('author', ['name', 'avatar']);
     if (!post) return res.status(404).json({ msg: 'Post not found' });
     res.json(post);
   } catch (err) {
@@ -60,7 +61,7 @@ router.post('/', auth, async (req, res) => {
 router.put('/:id', auth, async (req, res) => {
   const { title, content } = req.body;
   try {
-    let post = await findById(req.params.id);
+    let post = await BlogPost.findById(req.params.id);
     if (!post) return res.status(404).json({ msg: 'Post not found' });
 
     // Check user
@@ -68,7 +69,7 @@ router.put('/:id', auth, async (req, res) => {
       return res.status(401).json({ msg: 'User not authorized' });
     }
 
-    post = await findByIdAndUpdate(
+    post = await BlogPost.findByIdAndUpdate(
       req.params.id,
       { $set: { title, content, updatedAt: Date.now() } },
       { new: true }
@@ -84,7 +85,7 @@ router.put('/:id', auth, async (req, res) => {
 // Delete a blog post
 router.delete('/:id', auth, async (req, res) => {
   try {
-    const post = await findById(req.params.id);
+    const post = await BlogPost.findById(req.params.id);
     if (!post) return res.status(404).json({ msg: 'Post not found' });
 
     // Check user

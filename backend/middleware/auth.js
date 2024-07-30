@@ -1,7 +1,7 @@
-import passport, { use } from 'passport';
-import { Strategy as JwtStrategy } from 'passport-jwt';
-import { ExtractJwt } from 'passport-jwt';
-import { findById } from '../models/User';
+const passport = require('passport');
+const JwtStrategy = require('passport-jwt').Strategy;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
+const User = require('../models/User');
 require('dotenv').config();
 
 // Configuring a JWT authentication strategy with passport
@@ -10,11 +10,11 @@ const opts = {
   secretOrKey: process.env.JWT_SECRET,
 };
 
-use(
+passport.use(
   new JwtStrategy(opts, async (jwt_payload, done) => {
     try {
     // Find a user in the database using the ID from the JWT payload
-      const user = await findById(jwt_payload.user.id);
+      const user = await User.findById(jwt_payload.user.id);
       if (user) {
         return done(null, user);
       }
@@ -25,4 +25,4 @@ use(
   })
 );
 
-export default passport;
+module.exports = passport;
