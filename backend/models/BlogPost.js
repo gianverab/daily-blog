@@ -1,6 +1,6 @@
-import { Schema, model } from 'mongoose';
+const mongoose = require('mongoose');
 
-const BlogPostSchema = new Schema({
+const BlogPostSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -10,7 +10,7 @@ const BlogPostSchema = new Schema({
     required: true,
   },
   author: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
   },
@@ -24,4 +24,4 @@ const BlogPostSchema = new Schema({
   },
 });
 
-export default model('BlogPost', BlogPostSchema);
+module.exports = mongoose.model('BlogPost', BlogPostSchema);
