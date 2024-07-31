@@ -9,6 +9,10 @@ const PostList = ({ getPosts, posts }) => {
     getPosts();
   }, [getPosts]);
 
+  if (!posts.length) {
+    return <p>No blog posts available.</p>;
+  }
+
   return (
     <div>
       {posts.map(post => (
